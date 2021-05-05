@@ -11,9 +11,8 @@
 
 <script>
 
-import Portfolio from "@/components/Portfolio";
 export default {
-  components: {Portfolio},
+  components: {},
   props:['theme'],
   methods: {
     closeModal(){
