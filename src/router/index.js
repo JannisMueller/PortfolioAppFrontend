@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
+import UpdatePortfolio from "@/views/UpdatePortfolio";
 
 
 
@@ -15,10 +16,16 @@ const routes = [
 
     },
     {
-        path: '/update',
-        name: 'update',
-        component: () => import(/* webpackChunkName: "about" */ '../components/CreateAsset.vue')
+        path: '/updatePortfolio',
+        name: 'updatePortfolio',
+        component: UpdatePortfolio
     },
+    {
+        path: '/bar',
+        name: 'Bar',
+        component: () => import('../views/Bar.vue')
+    }
+
 
 ]
 

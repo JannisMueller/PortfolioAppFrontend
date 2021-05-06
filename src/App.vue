@@ -4,8 +4,9 @@
 
 
     <div id="nav">
+      <router-link to="/bar">Bar</router-link> |
       <router-link to="/">Home</router-link> |
-      <router-link to="/update">Update Portfolio</router-link>
+      <router-link to="/updatePortfolio">Update Portfolio</router-link>
 
     </div>
 
@@ -19,8 +20,8 @@
 
 export default {
   name: 'App',
-
-  }
+  components: {},
+}
 
 
 </script>

@@ -1,15 +1,16 @@
 <template>
   <div>
   <h1>{{ title }}</h1>
-    <Portfolio/>
+    <h2>Overview Chart Portfolio</h2>
+    <Details/>
   </div>
 </template>
 
 <script>
-import Portfolio from "@/components/Portfolio";
+import Details from "@/components/Details";
 export default {
   name: "Home.vue",
-  components: {Portfolio},
+  components: {Details},
   data: function () {
     return {
       title: 'Portfolio Jannis Müller',
