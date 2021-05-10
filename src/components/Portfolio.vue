@@ -11,6 +11,7 @@
           <td>Gains</td>
           <td>Action</td>
 
+
         </tr>
 
         <tr v-for="asset in assets"
@@ -19,9 +20,23 @@
           <td>{{asset.nameOfAsset}}</td>
           <td>{{asset.typeOfAsset}}</td>
           <td>{{asset.initialValue}}</td>
-          <td>{{asset.currentValue}}</td>
+          <td>{{asset.currentValue}}
+
+          </td>
           <td>{{asset.gain}}</td>
-          <td><button v-on:click="deleteAsset(asset.id)">Delete</button></td>
+          <td><button v-on:click="deleteAsset(asset.id)">Delete</button>
+            <button @click="updateValue(asset.id)">Update</button>
+          </td>
+
+<!--            <label for="newCurrentValue"></label>
+            <input
+                id="newCurrentValue"
+                placeholder="new Value"
+                v-model="newCurrentValue"
+                type="text"
+            >-->
+
+
         </tr>
 
         <tr>
@@ -101,7 +116,9 @@ export default {
       typeOfAsset: '',
       initialValue: null,
       currentValue: null,
-      gain: null
+      gain: null,
+      newCurrentValue: null
+
 
     }
   },
@@ -115,8 +132,8 @@ export default {
             this.assets = data
           })
           .then(() => {
-        this.fetchData();
-      })
+            this.fetchData();
+          })
           .catch(err => console.log(err.message))
 
     },
@@ -125,23 +142,32 @@ export default {
         this.fetchData();
       })
     },
-    submit(){
-      let asset = {nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
-        initialValue: this.initialValue, currentValue: this.currentValue, gain: this.gain}
-      axios.post('http://localhost:5050/assets',asset)
+    submit() {
+      let asset = {
+        nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
+        initialValue: this.initialValue, currentValue: this.currentValue, gain: this.gain
+      }
+      axios.post('http://localhost:5050/assets', asset)
           .catch(err => console.log(err.message));
 
-      this.nameOfAsset= '';
-      this.typeOfAsset= '';
+      this.nameOfAsset = '';
+      this.typeOfAsset = '';
       this.initialValue = null;
-      this.currentValue= null;
-      this.gain= null;
+      this.currentValue = null;
+      this.gain = null;
+    },
+    updateValue(id) {
+      axios.patch('http://localhost:5050/assets/' + id, this.newCurrentValue).then(() => {
+        this.fetchData()
+      });
+
     }
-  },
-  mounted() {
-    this.fetchData();
+    },
+    mounted() {
+      this.fetchData();
+    }
+
   }
-}
 
 
 </script>
