@@ -14,7 +14,7 @@ import Details from "@/components/Details";
 
 export default {
   name: "Home.vue",
-  components: {Details},
+  components: { Details},
   data: function () {
     return {
       title: 'Portfolio Jannis Müller',

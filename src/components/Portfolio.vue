@@ -20,24 +20,31 @@
           <td>{{asset.nameOfAsset}}</td>
           <td>{{asset.typeOfAsset}}</td>
           <td>{{asset.initialValue}}</td>
-          <td>{{asset.currentValue}}
-
-          </td>
+          <td>{{asset.currentValue}}</td>
           <td>{{asset.gain}}</td>
-          <td><button v-on:click="deleteAsset(asset.id)">Delete</button>
-            <button @click="updateValue(asset.id)">Update</button>
+          <td><button v-on:click="deleteAsset(asset.id)">Delete</button></td>
+          <td>
+
+
+            <form @submit.prevent="updateValue(asset.id)">
+
+                <label for="checkbox">Open editing</label>
+                <input type="checkbox" id="checkbox" v-model="checked">
+
+              <p>
+                <label :for="asset.id"
+                >Current Value </label>
+                <input
+                    :id="asset.id"
+                    v-model="newCurrentValue"
+                    type="text"
+                    :disabled="!checked"
+
+                >
+              </p>
+            </form>
+            <button @click="updateValue(asset.id)">Update Value</button>
           </td>
-
-<!--            <label for="newCurrentValue"></label>
-            <input
-                id="newCurrentValue"
-                placeholder="new Value"
-                v-model="newCurrentValue"
-                type="text"
-            >-->
-
-
-        </tr>
 
         <tr>
           <td><label for="nameOfAsset"> </label>
@@ -85,17 +92,18 @@
                 id="gain"
                 placeholder="gain"
                 v-model="gain"
-                type="text"
+                type="number"
             >
           </td>
           <td><button @click="submit">Add asset to Portfolio</button></td>
 
         </tr>
-
-
       </table>
 
+
+
  </div>
+
 
 </template>
 
@@ -117,7 +125,8 @@ export default {
       initialValue: null,
       currentValue: null,
       gain: null,
-      newCurrentValue: null
+      newCurrentValue: null,
+      checked: false
 
 
     }
@@ -157,9 +166,15 @@ export default {
       this.gain = null;
     },
     updateValue(id) {
-      axios.patch('http://localhost:5050/assets/' + id, this.newCurrentValue).then(() => {
-        this.fetchData()
-      });
+      console.log("in function update");
+      console.log("new Value: " + this.newCurrentValue)
+      console.log("id " + id)
+
+      axios.patch('http://localhost:5050/assets/' + id, {
+        currentValue: this.newCurrentValue
+      })
+          .catch(err => console.log(err.response.data));
+      this.newCurrentValue = '';
 
     }
     },
@@ -167,8 +182,7 @@ export default {
       this.fetchData();
     }
 
-  }
-
+}
 
 </script>
 

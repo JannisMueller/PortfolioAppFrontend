@@ -1,12 +1,10 @@
 <template>
   <div>
 <div class="backdrop" @click.self="closeModal"> <!-- funkar bara om kan click på backdrop området-->
-  <div class="modal" v-bind:class="{sale: theme === 'sale'}">
-    <input type="text" />
+  <CreateAsset/>
 
   </div>
 </div>
-  </div>
 </template>
 
 <script>
@@ -41,15 +39,6 @@ export default {
   height: 100%;
 }
 .modal h1 {
-  color: white;
-}
-
-.modal. sale{
-  background: crimson;
-  color: white;
-}
-
-.modal.sale h1 {
   color: white;
 }
 
