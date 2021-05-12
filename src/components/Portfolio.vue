@@ -10,12 +10,16 @@
           <td>Current Value</td>
           <td>Gains</td>
           <td>Action</td>
+          <td><label for="checkbox">Update Assets</label>
+            <input type="checkbox" id="checkbox" v-model="checked">
+          </td>
 
 
         </tr>
 
         <tr v-for="asset in assets"
             v-bind:key="asset.id"
+
         >
           <td>{{asset.nameOfAsset}}</td>
           <td>{{asset.typeOfAsset}}</td>
@@ -28,9 +32,6 @@
 
             <form @submit.prevent="updateValue(asset.id)">
 
-                <label for="checkbox">Open editing</label>
-                <input type="checkbox" id="checkbox" v-model="checked">
-
               <p>
                 <label :for="asset.id"
                 >Current Value </label>
@@ -38,12 +39,11 @@
                     :id="asset.id"
                     v-model="newCurrentValue"
                     type="text"
-                    :disabled="!checked"
+                    :disabled="!checked">
 
-                >
               </p>
             </form>
-            <button @click="updateValue(asset.id)">Update Value</button>
+            <button v-if="checked" @click="updateValue(asset.id)">Update Value</button>
           </td>
 
         <tr>
@@ -89,20 +89,22 @@
           <td>
             <label for="gain"></label>
             <input
+
                 id="gain"
                 placeholder="gain"
                 v-model="gain"
-                type="number"
+                type="text"
             >
           </td>
+        <td><button @click="clearRows"> clear input</button></td>
           <td><button @click="submit">Add asset to Portfolio</button></td>
 
         </tr>
       </table>
 
+    </div>
 
 
- </div>
 
 
 </template>
@@ -116,6 +118,7 @@ import axios from "axios";
 export default {
   name: "Portfolio",
   components: {},
+
   data: function () {
     return {
       showDetails: false,
@@ -126,11 +129,15 @@ export default {
       currentValue: null,
       gain: null,
       newCurrentValue: null,
-      checked: false
-
+      checked: false,
+      clearInput: false,
+      computedGains:0
 
     }
-  },
+
+
+    },
+
   methods: {
     fetchData() {
       fetch('http://localhost:5050/assets')
@@ -152,18 +159,23 @@ export default {
       })
     },
     submit() {
-      let asset = {
-        nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
-        initialValue: this.initialValue, currentValue: this.currentValue, gain: this.gain
-      }
-      axios.post('http://localhost:5050/assets', asset)
-          .catch(err => console.log(err.message));
+      if(!this.clearInput) {
 
-      this.nameOfAsset = '';
-      this.typeOfAsset = '';
-      this.initialValue = null;
-      this.currentValue = null;
-      this.gain = null;
+        let asset = {
+          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
+          initialValue: this.initialValue, currentValue: this.currentValue, gain: this.gain
+        }
+        axios.post('http://localhost:5050/assets', asset)
+            .catch(err => console.log(err.message));
+
+        this.nameOfAsset = '';
+        this.typeOfAsset = '';
+        this.initialValue = null;
+        this.currentValue = null;
+        this.gain = null;
+      } else{
+        this.clearRows();
+      }
     },
     updateValue(id) {
       console.log("in function update");
@@ -176,6 +188,14 @@ export default {
           .catch(err => console.log(err.response.data));
       this.newCurrentValue = '';
 
+    },
+    clearRows() {
+      this.clearInput=!this.clearInput;
+      this.nameOfAsset = '';
+      this.typeOfAsset = '';
+      this.initialValue = null;
+      this.currentValue = null;
+      this.gain = null;
     }
     },
     mounted() {
