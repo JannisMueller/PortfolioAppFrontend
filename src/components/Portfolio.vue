@@ -6,7 +6,7 @@
         <tr>
           <td>Name of Asset</td>
           <td>Type of Asset</td>
-          <td>Initial Value</td>
+          <td>Bucket</td>
           <td>Current Value</td>
           <td>Gains</td>
           <td>Action</td>
@@ -23,9 +23,9 @@
         >
           <td>{{asset.nameOfAsset}}</td>
           <td>{{asset.typeOfAsset}}</td>
-          <td>{{asset.initialValue}}</td>
+          <td>{{asset.bucket}}</td>
           <td>{{asset.currentValue}}</td>
-          <td>{{asset.gain}}</td>
+          <td>{{asset.gain + "%"}}</td>
           <td><button v-on:click="deleteAsset(asset.id)">Delete</button></td>
           <td>
 
@@ -34,14 +34,25 @@
 
               <p>
                 <label :for="asset.id"
-                >Current Value </label>
+                ></label>
                 <input
                     :id="asset.id"
                     v-model="newCurrentValue"
+                    placeholder="current value"
                     type="text"
                     :disabled="!checked">
-
+               </p>
+              <p>
+                <label :for="asset.id"
+                ></label>
+                <input   :id="asset.id"
+                         v-model="newGain"
+                         type="text"
+                         placeholder=" Gain in %"
+                         :disabled="!checked">
               </p>
+
+
             </form>
             <button v-if="checked" @click="updateValue(asset.id)">Update Value</button>
           </td>
@@ -62,17 +73,18 @@
                 id="typeOfAsset"
                 placeholder="Type of Asset "
                 v-model="typeOfAsset"
-                type="text"
+                type="select"
+
             >
           </td>
 
           <td
           ><p>
-            <label for="initialValue"></label>
+            <label for="bucket"></label>
             <input
-                id="initialValue"
-                placeholder="Initial Value"
-                v-model="initialValue"
+                id="bucket"
+                placeholder="bucket"
+                v-model="bucket"
                 type="text"
             >
           </p></td>
@@ -91,9 +103,10 @@
             <input
 
                 id="gain"
-                placeholder="gain"
+                placeholder="Gain in %"
                 v-model="gain"
                 type="text"
+                :disabled="false"
             >
           </td>
         <td><button @click="clearRows"> clear input</button></td>
@@ -101,6 +114,7 @@
 
         </tr>
       </table>
+
 
     </div>
 
@@ -118,20 +132,19 @@ import axios from "axios";
 export default {
   name: "Portfolio",
   components: {},
-
   data: function () {
     return {
       showDetails: false,
       assets: [],
       nameOfAsset: '',
       typeOfAsset: '',
-      initialValue: null,
+      bucket: '',
       currentValue: null,
       gain: null,
+      newGain: null,
       newCurrentValue: null,
       checked: false,
       clearInput: false,
-      computedGains:0
 
     }
 
@@ -153,6 +166,8 @@ export default {
           .catch(err => console.log(err.message))
 
     },
+
+
     deleteAsset: function (id) {
       axios.delete('http://localhost:5050/assets/' + id).then(() => {
         this.fetchData();
@@ -162,17 +177,18 @@ export default {
       if(!this.clearInput) {
 
         let asset = {
-          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
-          initialValue: this.initialValue, currentValue: this.currentValue, gain: this.gain
+          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset, bucket: this.bucket,
+          currentValue: this.currentValue, gain: this.gain
         }
         axios.post('http://localhost:5050/assets', asset)
             .catch(err => console.log(err.message));
 
         this.nameOfAsset = '';
         this.typeOfAsset = '';
-        this.initialValue = null;
+        this.bucket= ''
         this.currentValue = null;
         this.gain = null;
+
       } else{
         this.clearRows();
       }
@@ -180,23 +196,30 @@ export default {
     updateValue(id) {
       console.log("in function update");
       console.log("new Value: " + this.newCurrentValue)
-      console.log("id " + id)
+      console.log("id value " + id)
+
+      console.log("new gain: " + this.newGain)
+      console.log("id gain " + id)
 
       axios.patch('http://localhost:5050/assets/' + id, {
-        currentValue: this.newCurrentValue
+        currentValue: this.newCurrentValue,
+        gain: this.newGain
+
       })
           .catch(err => console.log(err.response.data));
       this.newCurrentValue = '';
+      this.newGain='';
 
     },
     clearRows() {
       this.clearInput=!this.clearInput;
       this.nameOfAsset = '';
       this.typeOfAsset = '';
-      this.initialValue = null;
       this.currentValue = null;
       this.gain = null;
-    }
+
+    },
+
     },
     mounted() {
       this.fetchData();

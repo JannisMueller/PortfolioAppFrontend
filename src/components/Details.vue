@@ -11,6 +11,8 @@
     <button v-if="!showDetails" @click="togglePortfolio">Show Details</button>
 
 
+
+
   </div>
 
 </template>
@@ -18,6 +20,9 @@
 <script>
 export default {
 name: "Details",
+  components:{
+  },
+
   data: function () {
     return {
       showDetails: false
