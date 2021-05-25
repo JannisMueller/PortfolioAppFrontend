@@ -85,7 +85,7 @@
                 id="bucket"
                 placeholder="bucket"
                 v-model="bucket"
-                type="text"
+                type="number"
             >
           </p></td>
           <td>

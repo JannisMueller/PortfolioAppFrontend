@@ -1,9 +1,10 @@
 <template>
   <div>
   <h1>{{ title }}</h1>
+
     <Overview></Overview>
 
-    <Details/>
+
 
 
 
@@ -14,13 +15,12 @@
 
 <script>
 
-import Details from "@/components/Details";
 import Overview from "@/components/Overview";
 
 
 export default {
   name: "Home.vue",
-  components: {Overview, Details},
+  components: {Overview},
 
   data: function () {
     return {
