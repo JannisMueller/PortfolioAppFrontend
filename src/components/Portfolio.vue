@@ -34,6 +34,7 @@
 
               <p>
                 <label :for="asset.id"
+
                 ></label>
                 <input
                     :id="asset.id"
@@ -194,12 +195,6 @@ export default {
       }
     },
     updateValue(id) {
-      console.log("in function update");
-      console.log("new Value: " + this.newCurrentValue)
-      console.log("id value " + id)
-
-      console.log("new gain: " + this.newGain)
-      console.log("id gain " + id)
 
       axios.patch('http://localhost:5050/assets/' + id, {
         currentValue: this.newCurrentValue,

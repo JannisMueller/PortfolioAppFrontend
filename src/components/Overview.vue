@@ -8,18 +8,21 @@
       <td>Assets</td>
       <td>Value</td>
       <td>Gain</td>
+      <td>% of Portfolio</td>
     </tr>
 
     <tr v-for="asset in assets"
     :key="asset.id">
     <td>{{asset.nameOfAsset}}</td>
-      <td>{{asset.currentValue + " kr"}}</td>
+      <td>{{ (asset.currentValue)}}</td>
       <td>{{asset.gain + "%"}}</td>
+      <td>{{ (asset.currentValue/totalValuePortfolio *100).toFixed(1) + "%"}}</td>
     </tr>
     <tr>
       <td>Total Value of Portfolio </td>
     <td>{{totalValuePortfolio}}</td>
-      <td>{{totalGainInPortfolio}}</td>
+      <td>{{totalGainInPortfolio + "%"}}</td>
+      <td>100%</td>
     </tr>
     <button @click="submitTotalValue"> Save total Value of Portfolio</button>
   </table>
@@ -38,8 +41,8 @@
     <tr v-for="metric in metrics"
     :key="metric.id"
     >
-      <td>{{metric.totalValue}}</td>
-      <td>{{metric.totalGain}}</td>
+      <td>{{ (metric.totalValue).toFixed(2) }}</td>
+      <td>{{ (metric.totalGain).toFixed(2) + "%" }}</td>
     </tr>
     </table>
 
@@ -95,10 +98,9 @@
     <br>
 
 
-  <div>
-    <pie-chart class="chart-container" :data="chartData" :options="chartOptions"></pie-chart>
-  </div>
-  <div>
+  <div class="chart-container">
+    <pie-chart :data="chartData" :options="chartOptions"></pie-chart>
+
     <line-chart :chart-data="datacollection"></line-chart>
   </div>
 
@@ -110,6 +112,7 @@
 import PieChart from "@/PieChart";
 import LineChart from "@/LineChart";
 import axios from "axios";
+
 export default {
   name: "Overview",
   components: {LineChart, PieChart},
@@ -204,7 +207,6 @@ export default {
   },
   mounted() {
     this.fetchData();
-    console.log(this.assets.bucket)
     this.fetchMetrics();
   },
 
@@ -246,6 +248,11 @@ export default {
       }
       return sum;
     },
+
+    shareOfPortfolio: function(id) {
+      let share = this.currentValue[id]/this.totalValuePortfolio
+      return share;
+    },
     totalValueBucketThree: function () {
       let sum = 0;
       for (var i = 0; i < this.bucketThree.length; i++) {
@@ -279,7 +286,7 @@ export default {
         gain = ((gain + this.assets[i].gain) / (this.assets.length - 1));
 
       }
-      return gain;
+      return gain.toFixed(1);
 
     }
   }
@@ -309,6 +316,9 @@ td{
   margin-top: 60px;
 }
 
+.chart-container{
+  max-width: 500px;
+}
 
 
 </style>
