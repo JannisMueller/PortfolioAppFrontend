@@ -42,7 +42,7 @@
     <br>
     <br>
 
-  <table>
+<!--  <table>
 
       <tr>
         <td>Total Value over time</td>
@@ -57,7 +57,7 @@
       <td>{{ (value.totalGain).toFixed(2) }}</td>
 
     </tr>
-    </table>
+    </table>-->
 
   </div>
 
@@ -143,17 +143,11 @@ export default {
         labels: [],
         datasets: [
           {
-            data: [0, 969, 970],
+            data: [],
             label: "Total value of Portfolio (in thousands)",
             borderColor: "#3e95cd",
             fill: false
           },
-          {
-            data: [0, 0.9, 1],
-            label: "Total value of Portfolio (in thousands)",
-            borderColor: "green",
-            fill: false
-          }
           ]
       },
       chartOptions: {
@@ -207,21 +201,49 @@ export default {
           .catch(err => console.log(err.message))
 
     },
-    fetchMetrics() {
-      fetch('http://localhost:5050/metrics')
-          .then((response) => {
-            return response.json()
+    async fetchMetrics() {
+      axios.get('http://localhost:5050/metrics')
+          .then(response => {
+
+
+
+            let data = response.data.map(value => value.totalValue);
+            let labels = response.data.map(value => value.id);
+            console.log(data);
+            this.updateChart(data,labels);
+
+/*            this.metrics = response.data
+/!*            this.totalValues = response.data.map(value => value.totalValue)
+            this.totalGains = response.data.map(value => value.totalGain)*!/
+            console.log(this.metrics)
+            console.log(this.totalValues)
+            console.log(this.totalGains)*/
+
+
           })
-          .then((data) => {
-            this.metrics = data
-            this.totalValues = data
-          })
-          .then(() => {
-            this.fetchData();
-          })
-          .catch(err => console.log(err.message))
 
   },
+
+    updateChart(data,labels){
+
+      console.log("inside")
+      this.dataCollection = {
+
+        labels: labels,
+
+        datasets: [
+          {
+            data: data,
+            label: "Total value of Portfolio (in thousands)",
+            borderColor: "#3e95cd",
+            fill: false
+          }
+        ]
+      }
+
+      console.log(data + " data + end")
+
+    },
 
 
     submitTotalValue() {
@@ -237,18 +259,13 @@ export default {
     },
       togglePortfolio() {
         this.showDetails = !this.showDetails;
-      },
-    toArrayGains(){
-      for(let i = 0; i < this.metrics.length; i++){
-        this.totalValues.push(this.metrics[i].totalValue)
       }
 
-    }
-
     },
-    mounted() {
+  mounted() {
       this.fetchData();
       this.fetchMetrics();
+
 
 
     },
