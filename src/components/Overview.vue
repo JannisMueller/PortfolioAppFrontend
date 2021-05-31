@@ -139,17 +139,7 @@ export default {
   components: {LineChart, PieChart},
   data: function () {
     return {
-      dataCollection: {
-        labels: [],
-        datasets: [
-          {
-            data: [],
-            label: "Total value of Portfolio (in thousands)",
-            borderColor: "#3e95cd",
-            fill: false
-          },
-          ]
-      },
+      dataCollection: null,
       chartOptions: {
         hoverBorderWidth: 20,
         responsive: true
