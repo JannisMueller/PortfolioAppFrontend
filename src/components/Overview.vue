@@ -139,7 +139,7 @@ export default {
   components: {LineChart, PieChart},
   data: function () {
     return {
-      dataCollection: null,
+      dataCollection: [],
       chartOptions: {
         hoverBorderWidth: 20,
         responsive: true
