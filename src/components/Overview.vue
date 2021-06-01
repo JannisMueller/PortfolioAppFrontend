@@ -1,6 +1,5 @@
 <template>
 
-  <div>
 
   <div>
     <div class="overview">
@@ -24,13 +23,13 @@
       <td class="bottom-line" >Current Value of Portfolio </td>
 
     <td>{{totalValuePortfolio}}</td>
-      <td :class="{green: totalGainInPortfolio>0, red: totalGainInPortfolio<0}">{{totalGainInPortfolio + "%"}}</td>
+      <td :class="{green: totalGainInPortfolio>0, red: totalGainInPortfolio<0}">{{ (totalGainInPortfolio *100).toFixed(5) + "%"}}</td>
       <td>100%</td>
     </tr>
   <tr class="column-header">
-    <td>Total gain in Stocks</td>
+    <td>avg. gain in Stocks</td>
     <td></td>
-    <td>{{totalGainOfStocksInPortfolio}}</td>
+    <td :class="{green: totalGainOfStocksInPortfolio, red: totalGainOfStocksInPortfolio<0}">{{totalGainOfStocksInPortfolio + "%"}}</td>
     <td></td>
 
   </tr>
@@ -41,26 +40,6 @@
 
     <br>
     <br>
-
-<!--  <table>
-
-      <tr>
-        <td>Total Value over time</td>
-        <td>Total Gain over time</td>
-      </tr>
-
-
-    <tr v-for="value in totalValues"
-    :key="value.id"
-    >
-      <td>{{ (value.totalValue).toFixed(2) }}</td>
-      <td>{{ (value.totalGain).toFixed(2) }}</td>
-
-    </tr>
-    </table>-->
-
-  </div>
-
 
 
     <br>
@@ -160,6 +139,7 @@ export default {
       metrics: [],
       totalGains: [],
       totalValues: [],
+      stocks:  [],
       nameOfAsset: '',
       typeOfAsset: '',
       bucket: null,
@@ -172,21 +152,19 @@ export default {
       shareStocks: 13,
       shareBondsShort: 13,
       shareBondsLong: 34,
-      sharePension: 56
+      sharePension: 56,
+      totalGainInPortfolio: null
 
     }
   },
   methods: {
     fetchData() {
-      fetch('http://localhost:5050/assets')
+     axios.get('http://localhost:5050/assets')
           .then((response) => {
-            return response.json()
-          })
-          .then((data) => {
-            this.assets = data
-          })
-          .then(() => {
-            this.fetchData();
+
+            this.assets = response.data;
+            this.stocks = response.data;
+
           })
           .catch(err => console.log(err.message))
 
@@ -196,18 +174,11 @@ export default {
           .then(response => {
 
 
-
+            this.metrics = response.data;
             let data = response.data.map(value => value.totalValue);
-            let labels = response.data.map(value => value.id);
-            console.log(data);
+            let labels = response.data.map(time => time.id);
             this.updateChart(data,labels);
-
-/*            this.metrics = response.data
-/!*            this.totalValues = response.data.map(value => value.totalValue)
-            this.totalGains = response.data.map(value => value.totalGain)*!/
-            console.log(this.metrics)
-            console.log(this.totalValues)
-            console.log(this.totalGains)*/
+            this.calculateTotalGainInPortfolio();
 
 
           })
@@ -238,9 +209,9 @@ export default {
 
     submitTotalValue() {
 
+
       let keyMetricAsset = {totalValue: this.totalValuePortfolio, totalGain: this.totalGainInPortfolio};
 
-      this.totalValues.push(this.totalValue);
 
       axios.post('http://localhost:5050/metrics', keyMetricAsset)
           .then(() => this.fetchMetrics())
@@ -249,13 +220,18 @@ export default {
     },
       togglePortfolio() {
         this.showDetails = !this.showDetails;
-      }
+      },
+
+    calculateTotalGainInPortfolio() {
+
+      this.totalGainInPortfolio = (this.metrics[this.metrics.length-1].totalValue-this.metrics[this.metrics.length-2].totalValue)/this.metrics[this.metrics.length-2].totalValue
+
+    },
 
     },
   mounted() {
       this.fetchData();
       this.fetchMetrics();
-
 
 
     },
@@ -330,30 +306,30 @@ export default {
 
 
       },
-      totalGainInPortfolio() {
-        let gain = 0;
-        for (let i = 0; i < this.assets.length; i++) {
-          gain = ((gain + this.assets[i].gain) / (this.assets.length - 1));
+
+      totalGainOfStocksInPortfolio() {
+
+        let totalGain = 0;
+        let gainStocks = 0;
+        let counter = 0;
+
+        for (let i = 0; i < this.stocks.length; i++) {
+          if((this.stocks[i].bucket === 3)) {
+            totalGain = totalGain + (this.stocks[i].gain)
+          }
+
+            if((this.stocks[i].bucket === 3)){
+
+            gainStocks = gainStocks + (this.stocks[i].gain);
+            counter = counter +1;
+
+            }
 
         }
-        return gain.toFixed(1);
-
-      },
-      totalGainOfStocksInPortfolio() {
-        let gainStocks = 0;
-
-
-        return gainStocks.toFixed(1);
+        return (gainStocks/counter).toFixed(1)
 
       }
-
-
-
-
-
-      }
-
-
+    }
 
 
 }
