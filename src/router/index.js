@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import UpdatePortfolio from "@/views/UpdatePortfolio";
+import UpdatePensionPortfolio from "@/views/UpdatePensionPortfolio";
 
 
 
@@ -21,10 +22,12 @@ const routes = [
         component: UpdatePortfolio
     },
     {
-        path: '/bar',
-        name: 'Bar',
-        component: () => import('../views/Bar.vue')
-    }
+        path: '/updatePensionPortfolio',
+        name: '/updatePensionPortfolio',
+        component: UpdatePensionPortfolio
+    },
+
+
 
 
 ]

@@ -1,14 +1,12 @@
-
 <template>
 
-  <div>
+
+    <div>
       <table class="table-container-bucket" border="1px">
         <tr>
           <td>Name of Asset</td>
           <td>Type of Asset</td>
-          <td>Bucket</td>
           <td>Current Value</td>
-          <td>Gains</td>
           <td>Action</td>
           <td><label for="checkbox">Update Assets</label>
             <input type="checkbox" id="checkbox" v-model="checked">
@@ -23,9 +21,7 @@
         >
           <td>{{asset.nameOfAsset}}</td>
           <td>{{asset.typeOfAsset}}</td>
-          <td>{{asset.bucket}}</td>
           <td>{{asset.currentValue}}</td>
-          <td>{{asset.gain + "%"}}</td>
           <td><button v-on:click="deleteAsset(asset.id)">Delete</button></td>
           <td>
 
@@ -42,21 +38,12 @@
                     placeholder="current value"
                     type="text"
                     :disabled="!checked">
-               </p>
-              <p>
-                <label :for="asset.id"
-                ></label>
-                <input   :id="asset.id"
-                         v-model="newGain"
-                         type="text"
-                         placeholder=" Gain in %"
-                         :disabled="!checked">
               </p>
-
 
             </form>
             <button v-if="checked" @click="updateValue(asset.id)">Update Value</button>
           </td>
+        </tr>
 
         <tr>
           <td><label for="nameOfAsset"> </label>
@@ -79,16 +66,7 @@
             >
           </td>
 
-          <td
-          ><p>
-            <label for="bucket"></label>
-            <input
-                id="bucket"
-                placeholder="bucket"
-                v-model="bucket"
-                type="number"
-            >
-          </p></td>
+
           <td>
             <label for="currentValue"> </label>
             <input
@@ -99,18 +77,8 @@
             >
           </td>
 
-          <td>
-            <label for="gain"></label>
-            <input
 
-                id="gain"
-                placeholder="Gain in %"
-                v-model="gain"
-                type="text"
-                :disabled="false"
-            >
-          </td>
-        <td><button @click="clearRows"> clear input</button></td>
+          <td><button @click="clearRows"> clear input</button></td>
           <td><button @click="submit">Add asset to Portfolio</button></td>
 
         </tr>
@@ -120,57 +88,42 @@
     </div>
 
 
-
-
 </template>
 
-
 <script>
-
 
 import axios from "axios";
 
 export default {
-  name: "Portfolio",
-  components: {},
+  name: "PortfolioAsset",
   data: function () {
     return {
       showDetails: false,
       assets: [],
       nameOfAsset: '',
       typeOfAsset: '',
-      bucket: '',
       currentValue: null,
-      gain: null,
-      newGain: null,
       newCurrentValue: null,
       checked: false,
       clearInput: false,
 
     }
-
-
-    },
+  },
 
   methods: {
     fetchData() {
-      fetch('http://localhost:5050/assets')
+      axios.get('http://localhost:5050/pension')
           .then((response) => {
-            return response.json()
-          })
-          .then((data) => {
-            this.assets = data
-          })
-          .then(() => {
-            this.fetchData();
-          })
+            this.assets = response.data
+          }).then(() => {
+        this.fetchData();
+      })
           .catch(err => console.log(err.message))
-
     },
 
 
     deleteAsset: function (id) {
-      axios.delete('http://localhost:5050/assets/' + id).then(() => {
+      axios.delete('http://localhost:5050/pension/' + id).then(() => {
         this.fetchData();
       })
     },
@@ -178,17 +131,15 @@ export default {
       if(!this.clearInput) {
 
         let asset = {
-          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset, bucket: this.bucket,
-          currentValue: this.currentValue, gain: this.gain
+          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
+          currentValue: this.currentValue
         }
-        axios.post('http://localhost:5050/assets', asset)
+        axios.post('http://localhost:5050/pension', asset)
             .catch(err => console.log(err.message));
 
         this.nameOfAsset = '';
         this.typeOfAsset = '';
-        this.bucket= ''
         this.currentValue = null;
-        this.gain = null;
 
       } else{
         this.clearRows();
@@ -196,14 +147,13 @@ export default {
     },
     updateValue(id) {
 
-      axios.patch('http://localhost:5050/assets/' + id, {
+      axios.patch('http://localhost:5050/pension/' + id, {
         currentValue: this.newCurrentValue,
-        gain: this.newGain
+
 
       })
-          .catch(err => console.log(err.response.data));
+      .catch(err => console.log(err.response.data));
       this.newCurrentValue = '';
-      this.newGain='';
 
     },
     clearRows() {
@@ -211,25 +161,25 @@ export default {
       this.nameOfAsset = '';
       this.typeOfAsset = '';
       this.currentValue = null;
-      this.gain = null;
+
 
     },
 
-    },
-    mounted() {
-      this.fetchData();
-    }
+  },
+  mounted() {
+    this.fetchData();
+  }
 
 }
+
+
+
 
 </script>
 
-
-
 <style scoped>
 .table-container-bucket{
-  max-width: 800px;
-}
-
+    max-width: 800px;
+  }
 
 </style>

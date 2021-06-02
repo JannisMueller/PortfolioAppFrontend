@@ -4,10 +4,9 @@
 
 
     <div id="nav">
-      <router-link to="/bar">Bar</router-link> |
       <router-link to="/">Home</router-link> |
-      <router-link to="/updatePortfolio">Update Portfolio</router-link>
-
+      <router-link to="/updatePortfolio">Update Portfolio</router-link> |
+      <router-link to="/updatePensionPortfolio">Update PensionPortfolio</router-link>
     </div>
 
     <router-view/>
@@ -39,5 +38,14 @@ h1{
   border-bottom:  1px solid #ddd;
   display: inline-block;
   padding-bottom: 10px;
+}
+
+body{
+  background-color: #efefef;
+  color: black;
+  text-align: center;
+  font-family: 'Open Sans', sans-serif;
+  padding-left: 15px;
+
 }
 </style>

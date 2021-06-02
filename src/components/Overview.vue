@@ -1,14 +1,17 @@
 <template>
 
-
   <div>
+
+
+
     <div class="overview">
-  <table>
-    <tr class="column-header">
-      <td></td>
-      <td>Value</td>
-      <td>Gain</td>
-      <td>% of Portfolio</td>
+
+  <table  class="table-container">
+    <tr class="column-header" >
+      <td class="column-header"></td>
+      <td class="column-header">Value</td>
+      <td class="column-header">Gain</td>
+      <td class="column-header">% of Portfolio</td>
 
     </tr>
 
@@ -20,90 +23,112 @@
       <td :class="{green: asset.gain>1, red: asset.gain<0, orange: asset.gain <= 1}">{{ (asset.currentValue/totalValuePortfolio *100).toFixed(1) + "%"}}</td>
     </tr>
     <tr>
-      <td class="bottom-line" >Current Value of Portfolio </td>
+      <td class="bottom-line" >Return of Portfolio </td>
 
-    <td>{{totalValuePortfolio}}</td>
-      <td :class="{green: totalGainInPortfolio>0, red: totalGainInPortfolio<0}">{{ (totalGainInPortfolio *100).toFixed(5) + "%"}}</td>
-      <td>100%</td>
+    <td class="bottom-line" >{{ (totalValuePortfolio) + " kr"}}</td>
+      <td class="bottom-line" :class="{green: totalGainInPortfolio>0, red: totalGainInPortfolio<0}">{{ (totalGainInPortfolio *100).toFixed(5) + "%"}}</td>
+      <td class="bottom-line">100%</td>
     </tr>
   <tr class="column-header">
-    <td>avg. gain in Stocks</td>
+    <td> avg. return Stocks</td>
     <td></td>
     <td :class="{green: totalGainOfStocksInPortfolio, red: totalGainOfStocksInPortfolio<0}">{{totalGainOfStocksInPortfolio + "%"}}</td>
     <td></td>
 
   </tr>
 
-    <button @click="submitTotalValue()"> Save total Value of Portfolio</button>
+    <button class="button" @click="submitTotalValue()"> Save total Value of Portfolio</button>
   </table>
-    </div>
-
-    <br>
-    <br>
-
-
-    <br>
-    <br>
 
   <div class="chart-container">
-    <line-chart :chart-data="dataCollection"></line-chart>
-    <br>
-    <br>
-    <pie-chart :data="chartData" :options="chartOptions"></pie-chart>
-
-
+    <line-chart :chart-data="dataCollection" :options="options"></line-chart>
   </div>
-
-    <br>
-    <br>
+    <div class="chart-container">
+      <pie-chart :width="420" :height="250" :chart-data="chartData" :chart-options="chartOptions"></pie-chart>
+    </div>
 
     <div>
 
-      <table v-if="showDetails">
+      <table class="table-container-bucket">
 
-        <tr>
-          <td>Bucket 1</td>
-          <td>Bucket 2</td>
-          <td>Bucket 3</td>
-          <td>Bucket 4</td>
+        <tr class="column-header">
+          <td class="column-header">Bucket 1</td>
+          <td class="column-header">Bucket 2</td>
+          <td class="column-header">Bucket 3</td>
+          <td class="column-header">Bucket 4</td>
         <tr class="bg-emerald-200">
           <td>
             <ol>
-              <li v-for="asset in bucketOne" :key="asset.id">{{asset.nameOfAsset}} {{asset.currentValue}}</li>
+              <li v-for="asset in bucketOne" :key="asset.id">{{asset.nameOfAsset}}</li>
             </ol>
           </td>
 
           <td>
             <ol>
-              <li v-for="asset in bucketTwo" :key="asset.id">{{asset.nameOfAsset}} {{asset.currentValue}}</li>
+              <li v-for="asset in bucketTwo" :key="asset.id">{{asset.nameOfAsset}}</li>
             </ol>
           </td>
 
           <td>
             <ol>
-              <li v-for="asset in bucketThree" :key="asset.id">{{asset.nameOfAsset}} {{asset.currentValue}}</li>
+              <li v-for="asset in bucketThree" :key="asset.id">{{asset.nameOfAsset}}</li>
             </ol>
           </td>
 
           <td>
             <ol v-for="asset in bucketFour" :key="asset.id">
-              <li> {{asset.nameOfAsset}} {{asset.currentValue}}</li>
+              <li>{{asset.nameOfAsset}}</li>
             </ol>
           </td>
         </tr>
         <tr>
-          <td>{{totalValueBucketOne}}</td>
-          <td>{{totalValueBucketTwo}}</td>
-          <td>{{totalValueBucketThree}}</td>
-          <td>{{totalValueBucketFour}}</td>
+          <td class="bottom-line" >{{totalValueBucketOne + " kr"}}</td>
+          <td class="bottom-line" >{{totalValueBucketTwo + " kr"}}</td>
+          <td class="bottom-line" >{{totalValueBucketThree + " kr"}}</td>
+          <td class="bottom-line" >{{totalValueBucketFour + " kr"}}</td>
         </tr>
-        <button @click="togglePortfolio">Close Bucket-view</button>
       </table>
-      <button v-if="!showDetails" @click="togglePortfolio">Show Bucket-view</button>
+    </div>
+
+      <progress-bar
+          :options="options"
+          :value="(this.totalValuePortfolio/4500000*100).toFixed(2)"> </progress-bar>
+
+      <div>
+
+          <table  class="table-container-pension">
+            <tr class="column-header" >
+              <td class="column-header"></td>
+              <td class="column-header">Value</td>
+              <td class="column-header">% of Pension</td>
+
+            </tr>
+
+            <tr  v-for="pension in pensionAsset"
+                 :key="pension.id">
+              <td class="row-header">{{pension.nameOfAsset}}</td>
+              <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue)}}</td>
+              <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue/totalValuePensionPortfolio *100).toFixed(1) + "%"}}</td>
+            </tr>
+            <tr>
+              <td class="bottom-line" >Total </td>
+
+              <td class="bottom-line" >{{ (totalValuePensionPortfolio) + " kr"}}</td>
+              <td class="bottom-line">100%</td>
+            </tr>
+
+        </table>
+
+      </div>
+
+
+
+
 
     </div>
 
   </div>
+
 </template>
 
 
@@ -118,24 +143,38 @@ export default {
   components: {LineChart, PieChart},
   data: function () {
     return {
+      options: {
+        text: {
+          color: '#0e0d0d',
+          shadowEnable: false,
+          shadowColor: '#000000',
+          fontSize: 12,
+
+          dynamicPosition: true,
+          hideText: false
+        },
+        progress: {
+          color: '#2d94bd',
+          backgroundColor: '#FFFFFF',
+
+
+        },
+        layout: {
+          height: 80,
+          width: 730,
+          verticalTextAlign: 61,
+          horizontalTextAlign: 43,
+          zeroOffset: 0,
+          strokeWidth: 30,
+          progressPadding: 0,
+          type: 'line'
+        }
+      },
       dataCollection: [],
-      chartOptions: {
-        hoverBorderWidth: 20,
-        responsive: true
-      },
-      chartData: {
-        hoverBackgroundColor: "red",
-        hoverBorderWidth: 10,
-        labels: ["Stock", "Short-term bonds", "long-term bonds", "Pension" ,"Gold"],
-        datasets: [
-          {
-            label: "Data One",
-            backgroundColor: ["#41B883", "#E46651", "#00D8FF", "#00D8FF"],
-            data: [15.4,31.0,0,52.6,0]
-          }
-        ]
-      },
+      chartOptions: [],
+      chartData: [],
       assets: [],
+      pensionAsset: [],
       metrics: [],
       totalGains: [],
       totalValues: [],
@@ -149,10 +188,6 @@ export default {
       totalGain: null,
       totalValueEachBucket: null,
       showDetails: false,
-      shareStocks: 13,
-      shareBondsShort: 13,
-      shareBondsLong: 34,
-      sharePension: 56,
       totalGainInPortfolio: null
 
     }
@@ -169,58 +204,87 @@ export default {
           .catch(err => console.log(err.message))
 
     },
+
+    fetchPensionData() {
+      axios.get('http://localhost:5050/pension')
+          .then((response) => {
+
+            this.pensionAsset = response.data;
+
+
+          })
+          .catch(err => console.log(err.message))
+
+    },
     async fetchMetrics() {
       axios.get('http://localhost:5050/metrics')
           .then(response => {
 
-
             this.metrics = response.data;
             let data = response.data.map(value => value.totalValue);
             let labels = response.data.map(time => time.id);
-            this.updateChart(data,labels);
+
             this.calculateTotalGainInPortfolio();
-
-
+            let shareOfStocks = ((this.totalValueBucketThree/this.totalValuePortfolio)*100).toFixed(2);
+            let shareOfShort = ((this.totalValueBucketOne/this.totalValuePortfolio)*100).toFixed(2);
+            let shareOfLong = ((this.totalValueBucketTwo/this.totalValuePortfolio)*100).toFixed(2);
+            this.updateChart(data,labels,shareOfStocks,shareOfShort,shareOfLong);
           })
-
   },
 
-    updateChart(data,labels){
+    updateChart(data,labels,shareOfStocks,shareOfShort,shareOfLong) {
 
-      console.log("inside")
-      this.dataCollection = {
+      this.chartOptions = {
+        hoverBorderWidth: 20,
+        responsive: false,
+        maintainAspectRatio: false,
+        fill: true
+      },
+          this.chartData = {
+            hoverBackgroundColor: "red",
+            hoverBorderWidth: 10,
+            labels: ["Stock", "Short-term bonds", "long-term bonds"],
+            datasets: [
+              {
+                label: "Data One",
+                backgroundColor: ["#4196b8", "#5160e4", "#00D8FF", "#00D8FF"],
+                data: [shareOfStocks, shareOfShort, shareOfLong]
+              }
+            ]
+          },
 
-        labels: labels,
+          this.options = {
 
-        datasets: [
-          {
-            data: data,
-            label: "Total value of Portfolio (in thousands)",
-            borderColor: "#3e95cd",
-            fill: false
-          }
-        ]
-      }
+              responsive: true,
+              maintainAspectRatio: false,
+          },
 
-      console.log(data + " data + end")
+          this.dataCollection = {
+
+              labels: labels,
+
+              datasets: [
+                {
+                  data: data,
+                  label: "Total value of Portfolio ",
+                  borderColor: "#3e95cd",
+                  fill: false
+                }
+              ]
+            }
 
     },
 
 
     submitTotalValue() {
 
-
       let keyMetricAsset = {totalValue: this.totalValuePortfolio, totalGain: this.totalGainInPortfolio};
-
 
       axios.post('http://localhost:5050/metrics', keyMetricAsset)
           .then(() => this.fetchMetrics())
           .catch(err => console.log(err.message));
 
     },
-      togglePortfolio() {
-        this.showDetails = !this.showDetails;
-      },
 
     calculateTotalGainInPortfolio() {
 
@@ -232,6 +296,7 @@ export default {
   mounted() {
       this.fetchData();
       this.fetchMetrics();
+      this.fetchPensionData();
 
 
     },
@@ -302,8 +367,18 @@ export default {
           sum = sum + this.assets[i].currentValue;
 
         }
-        return sum.toFixed(2);
+        return sum.toFixed(0);
 
+
+      },
+
+      totalValuePensionPortfolio() {
+        let sum = 0;
+        for (let i = 0; i < this.pensionAsset.length; i++) {
+          sum = sum + this.pensionAsset[i].currentValue;
+
+        }
+        return sum.toFixed(0);
 
       },
 
@@ -338,23 +413,31 @@ export default {
 <style scoped>
 
 th, td {
-  padding: 10px;
+  padding: 5px;
   text-align: left;
+  font-size: 12px;
 }
 tr:hover {background-color: #f5f5f5;}
 
 .column-header{
-  font-weight: bold ;
+  font-weight: bold;
+  border-bottom: 2px solid black;
 }
 .row-header{
   font-weight: bold
 }
 
+li{
+  font-size: 12px;
+}
+
 div.overview {
-  max-width: 500px;
-  float: left;
-  margin: auto;
-  padding-left: 45px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 10px;
+  row-gap: 50px;
+  justify-content: center;
 }
 
 .bottom-line{
@@ -363,9 +446,56 @@ div.overview {
 }
 
 .chart-container{
-  max-width: 500px;
-  float: right;
-  padding-right: 45px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: #ffffff;
+  border-radius:6px;
+  -moz-border-radius:6px;
+  padding: 12px;
+  height: 420px;
+
+}
+
+
+.table-container-bucket{
+  text-align: left;
+  table-layout: fixed;
+  border-radius:6px;
+  -moz-border-radius:6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  padding: 12px;
+  height: 420px;
+  width: 100%;
+}
+
+canvas{
+  width:420px !important;
+  height:420px !important;
+}
+
+
+.table-container{
+  padding: 12px;
+  table-layout: fixed;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  border-radius:6px;
+  -moz-border-radius:6px;
+  height: 448px;
+
+
+}
+
+.table-container-pension{
+  padding: 12px;
+  table-layout: fixed;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  border-radius:6px;
+  -moz-border-radius:6px;
+  height: 420px;
+  width: 100%;
+
 }
 .orange{
   color: orange;
@@ -378,7 +508,25 @@ div.overview {
   color: red;
 
 }
+.button {
+  background-color: #4c93af; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 8px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 10px;
+  float: left;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  transition-duration: 0.4s;
 
+}
+
+.button:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
 
 
 </style>

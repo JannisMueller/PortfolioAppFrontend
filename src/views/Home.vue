@@ -1,6 +1,6 @@
 <template>
   <div>
-  <h1>{{ title }}</h1>
+  <h1>Portfolio</h1>
 
     <Overview></Overview>
 
@@ -24,7 +24,7 @@ export default {
 
   data: function () {
     return {
-      title: 'Portfolio Jannis Müller',
+      title: 'Portfolio',
     }
   }
   }
