@@ -2,60 +2,18 @@
 
 
     <div>
-      <table class="table-container-bucket" border="1px">
-        <tr>
-          <td>Name of Asset</td>
-          <td>Type of Asset</td>
-          <td>Current Value</td>
-          <td>Action</td>
-          <td><label for="checkbox">Update Assets</label>
-            <input type="checkbox" id="checkbox" v-model="checked">
-          </td>
-
-
-        </tr>
-
-        <tr v-for="asset in assets"
-            v-bind:key="asset.id"
-
-        >
-          <td>{{asset.nameOfAsset}}</td>
-          <td>{{asset.typeOfAsset}}</td>
-          <td>{{asset.currentValue}}</td>
-          <td><button v-on:click="deleteAsset(asset.id)">Delete</button></td>
-          <td>
-
-
-            <form @submit.prevent="updateValue(asset.id)">
-
-              <p>
-                <label :for="asset.id"
-
-                ></label>
-                <input
-                    :id="asset.id"
-                    v-model="newCurrentValue"
-                    placeholder="current value"
-                    type="text"
-                    :disabled="!checked">
-              </p>
-
-            </form>
-            <button v-if="checked" @click="updateValue(asset.id)">Update Value</button>
-          </td>
-        </tr>
-
-        <tr>
-          <td><label for="nameOfAsset"> </label>
+<ol>
+          <li>
+          <label for="nameOfAsset"></label>
             <input
                 id="nameOfAsset"
                 placeholder="Name of Asset"
                 v-model="nameOfAsset"
                 type="text"
             >
-          </td>
+          </li>
 
-          <td>
+  <li>
             <label for="typeOfAsset"></label>
             <input
                 id="typeOfAsset"
@@ -64,25 +22,59 @@
                 type="select"
 
             >
-          </td>
+
+  </li>
+
+  <li>
+            <label for="bucket"></label>
+            <input
+                id="bucket"
+                placeholder="Bucket"
+                v-model="bucket"
+                type="number"
+            >
+  </li>
+
+  <li>
+      <label for="initialValue"></label>
+      <input
+          id="initialValue"
+          placeholder="Initial Value"
+          v-model="initialValue"
+          type="text"
+      >
+  </li>
+
+  <li>
 
 
-          <td>
-            <label for="currentValue"> </label>
+      <label for="currentValue"></label>
             <input
                 id="currentValue"
-                placeholder="Current Valuet"
+                placeholder="Current Value"
                 v-model="currentValue"
                 type="text"
             >
-          </td>
+  </li>
 
+  <li>
 
-          <td><button @click="clearRows"> clear input</button></td>
-          <td><button @click="submit">Add asset to Portfolio</button></td>
+            <label for="gain"></label>
+            <input
 
-        </tr>
-      </table>
+                id="gain"
+                placeholder="Gain in %"
+                v-model="gain"
+                type="text"
+                :disabled="false"
+            >
+
+  </li>
+
+          <button class="button_clear" @click="clearRows"> clear input</button>
+          <button class="button_add" @click="submit">Add asset to Portfolio</button>
+
+</ol>
 
 
     </div>
@@ -102,7 +94,11 @@ export default {
       assets: [],
       nameOfAsset: '',
       typeOfAsset: '',
+      bucket: '',
       currentValue: null,
+      initialValue: null,
+      gain: null,
+      newGain: null,
       newCurrentValue: null,
       checked: false,
       clearInput: false,
@@ -111,63 +107,56 @@ export default {
   },
 
   methods: {
-    fetchData() {
-      axios.get('http://localhost:5050/pension')
-          .then((response) => {
-            this.assets = response.data
-          }).then(() => {
-        this.fetchData();
-      })
-          .catch(err => console.log(err.message))
-    },
 
 
-    deleteAsset: function (id) {
-      axios.delete('http://localhost:5050/pension/' + id).then(() => {
-        this.fetchData();
-      })
-    },
     submit() {
       if(!this.clearInput) {
 
         let asset = {
-          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset,
-          currentValue: this.currentValue
+          nameOfAsset: this.nameOfAsset, typeOfAsset: this.typeOfAsset, bucket: this.bucket,
+          currentValue: this.currentValue, initialValue: this.initialValue, gain: this.gain
         }
-        axios.post('http://localhost:5050/pension', asset)
+        axios.post('http://localhost:5050/assets', asset)
             .catch(err => console.log(err.message));
 
         this.nameOfAsset = '';
         this.typeOfAsset = '';
+        this.bucket= ''
         this.currentValue = null;
+        this.gain = null;
+        this.fetchData();
 
       } else{
         this.clearRows();
       }
     },
-    updateValue(id) {
 
-      axios.patch('http://localhost:5050/pension/' + id, {
-        currentValue: this.newCurrentValue,
-
-
-      })
-      .catch(err => console.log(err.response.data));
-      this.newCurrentValue = '';
-
-    },
     clearRows() {
       this.clearInput=!this.clearInput;
       this.nameOfAsset = '';
       this.typeOfAsset = '';
       this.currentValue = null;
-
+      this.initialValue = null;
+      this.bucket= '';
+      this.gain = null;
 
     },
+    fetchData() {
+      axios.get('http://localhost:5050/assets')
+          .then((response) => {
+
+            this.assets = response.data;
+            this.stocks = response.data;
+
+          })
+          .catch(err => console.log(err.message))
+
+    }
 
   },
   mounted() {
     this.fetchData();
+
   }
 
 }
@@ -178,8 +167,72 @@ export default {
 </script>
 
 <style scoped>
-.table-container-bucket{
-    max-width: 800px;
-  }
+
+li {
+  list-style-type: none;
+  text-align: left;
+
+
+}
+
+input{
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  box-sizing: border-box;
+  font-weight: bold;
+  font-size: 12px;
+  text-align: center;
+}
+
+
+.button_add {
+  background-color: #4c93af; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 8px;
+  margin-right: 10px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  float: left;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  transition-duration: 0.4s;
+  position: absolute;
+  top: 86%;
+  left: 42%;
+
+}
+
+.button_add:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
+
+.button_clear {
+  background-color: #4c93af; /* Green */
+  border: none;
+  color: white;
+  padding: 8px 8px;
+  margin-right: 0px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 12px;
+  float: left;
+  box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+  transition-duration: 0.4s;
+  position: absolute;
+  top: 80%;
+  left: 47%;
+
+}
+
+.button_clear:hover {
+  background-color: #4CAF50; /* Green */
+  color: white;
+}
 
 </style>

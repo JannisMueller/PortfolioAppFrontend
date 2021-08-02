@@ -110,8 +110,10 @@
                 :disabled="false"
             >
           </td>
-        <td><button @click="clearRows"> clear input</button></td>
-          <td><button @click="submit">Add asset to Portfolio</button></td>
+
+        <button @click="clearRows"> clear input</button>
+
+        <button @click="submit">Add asset to Portfolio</button>
 
         </tr>
       </table>

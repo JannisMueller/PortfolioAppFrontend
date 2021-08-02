@@ -1,44 +1,86 @@
 <template>
 
-  <div>
 
 
 
-    <div class="overview">
+    <div class="overview"   :class="{'blur-content': showModal}" >
+
+
+      <popup   v-if="showModal" :showModal=showModal @clicked="onChildClick" class="backdrop"></popup>
 
   <table  class="table-container">
-    <tr class="column-header" >
+    <tr class="column-header">
       <td class="column-header"></td>
       <td class="column-header">Value</td>
       <td class="column-header">Gain</td>
       <td class="column-header">% of Portfolio</td>
+      <td class="column-header"><label for="checkbox">Update Assets</label>
+        <input type="checkbox" id="checkbox" v-model="checked">
+      </td>
 
     </tr>
 
     <tr  v-for="asset in assets"
     :key="asset.id">
-    <td class="row-header">{{asset.nameOfAsset}}</td>
+    <td class="row-header">{{asset.nameOfAsset}}
+      <button class="icon"  v-on:click="deleteAsset(asset.id)">🗑</button>
+    </td>
       <td :class="{green: asset.gain>1, red: asset.gain<0, orange: asset.gain <= 1}">{{ (asset.currentValue)}}</td>
       <td :class="{green: asset.gain>1, red: asset.gain<0, orange: asset.gain <= 1}">{{asset.gain + "%"}}</td>
       <td :class="{green: asset.gain>1, red: asset.gain<0, orange: asset.gain <= 1}">{{ (asset.currentValue/totalValuePortfolio *100).toFixed(1) + "%"}}</td>
+
+      <td>
+
+        <form v-if="checked" @submit.prevent="updateValue(asset.id)">
+
+          <label :for="asset.id"
+
+          ></label>
+          <input
+              :id="asset.id"
+              v-model="newCurrentValue"
+              placeholder="current value"
+              type="text"
+              :disabled="!checked">
+
+
+          <label :for="asset.id"
+          ></label>
+          <input   :id="asset.id"
+                   v-model="newGain"
+                   type="text"
+                   placeholder=" Gain in %"
+                   :disabled="!checked">
+
+        </form>
+
+        <button class="button" v-if="checked" @click="updateValue(asset.id)">Update Value</button>
+      </td>
     </tr>
-    <tr>
+    <tr >
       <td class="bottom-line" >Return of Portfolio </td>
 
     <td class="bottom-line" >{{ (totalValuePortfolio) + " kr"}}</td>
       <td class="bottom-line" :class="{green: totalGainInPortfolio>0, red: totalGainInPortfolio<0}">{{ (totalGainInPortfolio *100).toFixed(5) + "%"}}</td>
       <td class="bottom-line">100%</td>
+      <td class="bottom-line"></td>
     </tr>
   <tr class="column-header">
     <td> avg. return Stocks</td>
     <td></td>
     <td :class="{green: totalGainOfStocksInPortfolio, red: totalGainOfStocksInPortfolio<0}">{{totalGainOfStocksInPortfolio + "%"}}</td>
-    <td></td>
+    <td ></td>
 
   </tr>
 
-    <button class="button" @click="submitTotalValue()"> Save total Value of Portfolio</button>
+      <button class="button" @click="submitTotalValue()"> Save total Value of Portfolio</button>
+
+      <button class="button" @click="openModal" v-if="!showModal">Add Asset</button>
+
+
+
   </table>
+
 
   <div class="chart-container">
     <line-chart :chart-data="dataCollection" :options="options"></line-chart>
@@ -101,6 +143,8 @@
               <td class="column-header"></td>
               <td class="column-header">Value</td>
               <td class="column-header">% of Pension</td>
+              <td class="column-header"><label for="checkbox">Update Assets</label>
+                <input type="checkbox" id="checkboxPension" v-model="checked"> </td>
 
             </tr>
 
@@ -109,12 +153,32 @@
               <td class="row-header">{{pension.nameOfAsset}}</td>
               <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue)}}</td>
               <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue/totalValuePensionPortfolio *100).toFixed(1) + "%"}}</td>
+              <td>
+
+                <form v-if="checked" @submit.prevent="updatePension(pension.id)">
+
+                  <label :for="pension.id"
+
+                  ></label>
+                  <input
+                      :id="pension.id"
+                      v-model="newCurrentValuePension"
+                      placeholder="current value"
+                      type="text"
+                      :disabled="!checked">
+
+
+                </form>
+
+                <button class="button" v-if="checked" @click="updatePension(pension.id)">Update Value</button>
+              </td>
             </tr>
             <tr>
               <td class="bottom-line" >Total </td>
 
               <td class="bottom-line" >{{ (totalValuePensionPortfolio) + " kr"}}</td>
               <td class="bottom-line">100%</td>
+              <td class="bottom-line"></td>
             </tr>
 
         </table>
@@ -127,7 +191,7 @@
 
     </div>
 
-  </div>
+
 
 </template>
 
@@ -136,11 +200,12 @@
 import PieChart from "@/PieChart";
 import LineChart from "@/LineChart";
 import axios from "axios";
+import Popup from "@/components/Popup";
 
 
 export default {
   name: "Overview",
-  components: {LineChart, PieChart},
+  components: {LineChart, PieChart, Popup},
   data: function () {
     return {
       options: {
@@ -161,7 +226,7 @@ export default {
         },
         layout: {
           height: 80,
-          width: 730,
+          width: 672,
           verticalTextAlign: 61,
           horizontalTextAlign: 43,
           zeroOffset: 0,
@@ -186,13 +251,56 @@ export default {
       gain: null,
       totalValue: null,
       totalGain: null,
+      newGain: null,
       totalValueEachBucket: null,
       showDetails: false,
-      totalGainInPortfolio: null
+      totalGainInPortfolio: null,
+      showModal: false,
+      newCurrentValue: null,
+      checked: false,
+      newCurrentValuePension:null
 
     }
   },
   methods: {
+
+    updatePension(id) {
+      axios.patch('http://localhost:5050/pension/' + id, {
+        currentValue: this.newCurrentValuePension,
+      }).then(() => {
+        this.fetchPensionData();
+      })
+          .catch(err => console.log(err.response.data));
+      this.newCurrentValuePension = '';
+    },
+
+      updateValue(id) {
+
+      axios.patch('http://localhost:5050/assets/' + id, {
+        currentValue: this.newCurrentValue,
+        gain: this.newGain
+
+
+      }).then(() => {
+        this.fetchData();
+      })
+          .catch(err => console.log(err.response.data));
+      this.newCurrentValue = '';
+      this.newGain = '';
+      this.checked = false;
+
+    },
+
+
+
+    onChildClick () {
+      this.showModal = false;
+      this.fetchPensionData();
+    },
+
+    openModal() {
+      this.showModal = true;
+    },
     fetchData() {
      axios.get('http://localhost:5050/assets')
           .then((response) => {
@@ -215,6 +323,11 @@ export default {
           })
           .catch(err => console.log(err.message))
 
+    },
+    deleteAsset: function (id) {
+      axios.delete('http://localhost:5050/assets/' + id).then(() => {
+        this.fetchData();
+      })
     },
     async fetchMetrics() {
       axios.get('http://localhost:5050/metrics')
@@ -513,6 +626,7 @@ canvas{
   border: none;
   color: white;
   padding: 8px 8px;
+  margin-right: 10px;
   text-align: center;
   text-decoration: none;
   display: inline-block;
@@ -528,5 +642,34 @@ canvas{
   color: white;
 }
 
+.backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.modal {
+  background: #FFFFFF;
+  box-shadow: 2px 2px 20px 1px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+.icon {
+  border: white;
+  background-color: white;
+  font-size: 10px;
+}
+.blur-content{
+  filter: blur(5px);
+}
 
 </style>
