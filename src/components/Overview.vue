@@ -6,7 +6,7 @@
     <PopupAddPension v-if="showModalPension" :showModalPension=showModalPension @clicked="onChildClickPension" class="backdrop"></PopupAddPension>
 
 
-    <div :class="{'overlay': showModalAsset, 'overlay': showModalPension, 'overview': !showModalAsset }">
+    <div :class="{'overlay': (showModalAsset, showModalPension), 'overview':  (!showModalAsset, !showModalPension)}">
 
 
   <table  class="table-container">
@@ -151,7 +151,7 @@
 
             <tr  v-for="pension in pensionAsset"
                  :key="pension.id">
-              <td class="row-header">{{pension.nameOfAsset}}</td>
+              <td class="row-header">{{pension.nameOfAsset}} <button class="icon"  v-on:click="deletePension(pension.id)">🗑</button></td>
               <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue)}}</td>
               <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue/totalValuePensionPortfolio *100).toFixed(1) + "%"}}</td>
               <td>
@@ -341,6 +341,12 @@ export default {
         this.fetchData();
       })
     },
+    deletePension: function (id) {
+      axios.delete('http://localhost:5050/pension/' + id).then(() => {
+        this.fetchPensionData();
+      })
+    },
+
     async fetchMetrics() {
       axios.get('http://localhost:5050/metrics')
           .then(response => {
