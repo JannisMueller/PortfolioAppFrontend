@@ -1,7 +1,6 @@
 <template>
 
   <div class="modal">
-
     <portfolio-asset></portfolio-asset>
 
     <button @click="closeModal" onclick="window.location.reload();">Close</button>

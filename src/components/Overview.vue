@@ -1,12 +1,13 @@
 <template>
 
+  <div>
+
+    <popup v-if="showModalAsset" :showModal=showModalAsset @clicked="onChildClickAsset" class="backdrop"></popup>
+    <PopupAddPension v-if="showModalPension" :showModalPension=showModalPension @clicked="onChildClickPension" class="backdrop"></PopupAddPension>
 
 
+    <div :class="{'overlay': showModalAsset, 'overlay': showModalPension, 'overview': !showModalAsset }">
 
-    <div class="overview"   :class="{'blur-content': showModal}" >
-
-
-      <popup   v-if="showModal" :showModal=showModal @clicked="onChildClick" class="backdrop"></popup>
 
   <table  class="table-container">
     <tr class="column-header">
@@ -75,7 +76,7 @@
 
       <button class="button" @click="submitTotalValue()"> Save total Value of Portfolio</button>
 
-      <button class="button" @click="openModal" v-if="!showModal">Add Asset</button>
+      <button class="button" @click="openModalAsset" v-if="!showModalAsset">Add Asset</button>
 
 
 
@@ -180,6 +181,7 @@
               <td class="bottom-line">100%</td>
               <td class="bottom-line"></td>
             </tr>
+            <button class="button" @click="openModalPension" v-if="!showModalPension">Add Asset</button>
 
         </table>
 
@@ -190,7 +192,7 @@
 
 
     </div>
-
+  </div>
 
 
 </template>
@@ -200,12 +202,13 @@
 import PieChart from "@/PieChart";
 import LineChart from "@/LineChart";
 import axios from "axios";
-import Popup from "@/components/Popup";
+import Popup from "@/components/PopupAddAsset";
+import PopupAddPension from "@/components/PopupAddPension";
 
 
 export default {
   name: "Overview",
-  components: {LineChart, PieChart, Popup},
+  components: {LineChart, PieChart, Popup, PopupAddPension},
   data: function () {
     return {
       options: {
@@ -255,7 +258,8 @@ export default {
       totalValueEachBucket: null,
       showDetails: false,
       totalGainInPortfolio: null,
-      showModal: false,
+      showModalAsset: false,
+      showModalPension: false,
       newCurrentValue: null,
       checked: false,
       newCurrentValuePension:null
@@ -293,14 +297,22 @@ export default {
 
 
 
-    onChildClick () {
-      this.showModal = false;
+    onChildClickAsset () {
+      this.showModalAsset = false;
+      this.fetchData();
+    },
+    onChildClickPension () {
+      this.showModalPension = false;
       this.fetchPensionData();
     },
 
-    openModal() {
-      this.showModal = true;
+    openModalAsset() {
+      this.showModalAsset = true;
     },
+    openModalPension() {
+      this.showModalPension= true;
+    },
+
     fetchData() {
      axios.get('http://localhost:5050/assets')
           .then((response) => {
@@ -652,23 +664,40 @@ canvas{
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius:6px;
+  -moz-border-radius:6px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  background-color: white;
+  z-index: 999;
+
+
 
 }
 
 .modal {
+
   background: #FFFFFF;
   box-shadow: 2px 2px 20px 1px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  justify-content: center;
+  align-items: center;
 }
 .icon {
   border: white;
   background-color: white;
   font-size: 10px;
 }
-.blur-content{
+
+div.overlay{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 10px;
+  row-gap: 50px;
+  justify-content: center;
   filter: blur(5px);
 }
 

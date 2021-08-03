@@ -2,6 +2,7 @@
 
 
     <div>
+      <h2>Add Asset to Portfolio</h2>
 <ol>
           <li>
           <label for="nameOfAsset"></label>
@@ -123,6 +124,7 @@ export default {
         this.typeOfAsset = '';
         this.bucket= ''
         this.currentValue = null;
+        this.initialValue= null;
         this.gain = null;
         this.fetchData();
 
@@ -136,7 +138,7 @@ export default {
       this.nameOfAsset = '';
       this.typeOfAsset = '';
       this.currentValue = null;
-      this.initialValue = null;
+      this.initialValue = '';
       this.bucket= '';
       this.gain = null;
 
@@ -170,7 +172,7 @@ export default {
 
 li {
   list-style-type: none;
-  text-align: left;
+  text-align: center;
 
 
 }
@@ -179,11 +181,12 @@ input{
   width: 100%;
   padding: 12px 20px;
   margin: 8px 0;
-  display: inline-block;
   box-sizing: border-box;
   font-weight: bold;
   font-size: 12px;
-  text-align: center;
+  display: block;
+
+
 }
 
 
@@ -201,7 +204,7 @@ input{
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
   transition-duration: 0.4s;
   position: absolute;
-  top: 86%;
+  top: 84%;
   left: 42%;
 
 }
@@ -221,12 +224,11 @@ input{
   text-decoration: none;
   display: inline-block;
   font-size: 12px;
-  float: left;
   box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
   transition-duration: 0.4s;
   position: absolute;
-  top: 80%;
-  left: 47%;
+  top: 90%;
+  left: 48%;
 
 }
 

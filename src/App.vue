@@ -4,9 +4,9 @@
 
 
     <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/updatePortfolio">Update Portfolio</router-link> |
-      <router-link to="/updatePensionPortfolio">Update PensionPortfolio</router-link>
+      <router-link to="/"></router-link>
+<!--      <router-link to="/updatePortfolio">Update Portfolio</router-link> |
+      <router-link to="/updatePensionPortfolio">Update PensionPortfolio</router-link>-->
     </div>
 
     <router-view/>
