@@ -1,12 +1,13 @@
 <template>
 
+
   <div>
 
     <popup v-if="showModalAsset" :showModal=showModalAsset @clicked="onChildClickAsset" class="backdrop"></popup>
     <PopupAddPension v-if="showModalPension" :showModalPension=showModalPension @clicked="onChildClickPension" class="backdrop"></PopupAddPension>
 
 
-    <div :class="{'overlay': (showModalAsset, showModalPension), 'overview':  (!showModalAsset, !showModalPension)}">
+    <div :class="{'overlayAsset': (showModalAsset), 'overlay': (showModalPension), 'overview':  (!showModalAsset, !showModalPension)}">
 
 
   <table  class="table-container">
@@ -16,7 +17,7 @@
       <td class="column-header">Gain</td>
       <td class="column-header">% of Portfolio</td>
       <td class="column-header"><label for="checkbox">Update Assets</label>
-        <input type="checkbox" id="checkbox" v-model="checked">
+        <input type="checkbox" id="checkbox" v-model="checkedAssets">
       </td>
 
     </tr>
@@ -32,7 +33,7 @@
 
       <td>
 
-        <form v-if="checked" @submit.prevent="updateValue(asset.id)">
+        <form v-if="checkedAssets" @submit.prevent="updateValue(asset.id)">
 
           <label :for="asset.id"
 
@@ -42,7 +43,7 @@
               v-model="newCurrentValue"
               placeholder="current value"
               type="text"
-              :disabled="!checked">
+              :disabled="!checkedAssets">
 
 
           <label :for="asset.id"
@@ -51,11 +52,11 @@
                    v-model="newGain"
                    type="text"
                    placeholder=" Gain in %"
-                   :disabled="!checked">
+                   :disabled="!checkedAssets">
 
         </form>
 
-        <button class="button" v-if="checked" @click="updateValue(asset.id)">Update Value</button>
+        <button class="button" v-if="checkedAssets" @click="updateValue(asset.id)">Update Value</button>
       </td>
     </tr>
     <tr >
@@ -144,8 +145,8 @@
               <td class="column-header"></td>
               <td class="column-header">Value</td>
               <td class="column-header">% of Pension</td>
-              <td class="column-header"><label for="checkbox">Update Assets</label>
-                <input type="checkbox" id="checkboxPension" v-model="checked"> </td>
+              <td class="column-header"><label for="checkbox">Update Pension</label>
+                <input type="checkbox" id="checkboxPension" v-model="checkedPension"> </td>
 
             </tr>
 
@@ -156,7 +157,7 @@
               <td :class="{green: pension.gain>1, red: pension.gain<0, orange: pension.gain <= 1}">{{ (pension.currentValue/totalValuePensionPortfolio *100).toFixed(1) + "%"}}</td>
               <td>
 
-                <form v-if="checked" @submit.prevent="updatePension(pension.id)">
+                <form v-if="checkedPension" @submit.prevent="updatePension(pension.id)">
 
                   <label :for="pension.id"
 
@@ -166,12 +167,12 @@
                       v-model="newCurrentValuePension"
                       placeholder="current value"
                       type="text"
-                      :disabled="!checked">
+                      :disabled="!checkedPension">
 
 
                 </form>
 
-                <button class="button" v-if="checked" @click="updatePension(pension.id)">Update Value</button>
+                <button class="button" v-if="checkedPension" @click="updatePension(pension.id)">Update Value</button>
               </td>
             </tr>
             <tr>
@@ -261,7 +262,8 @@ export default {
       showModalAsset: false,
       showModalPension: false,
       newCurrentValue: null,
-      checked: false,
+      checkedAssets: false,
+      checkedPension: false,
       newCurrentValuePension:null
 
     }
@@ -276,6 +278,7 @@ export default {
       })
           .catch(err => console.log(err.response.data));
       this.newCurrentValuePension = '';
+      this.checkedPension = false;
     },
 
       updateValue(id) {
@@ -291,10 +294,9 @@ export default {
           .catch(err => console.log(err.response.data));
       this.newCurrentValue = '';
       this.newGain = '';
-      this.checked = false;
+      this.checkedAssets = false;
 
     },
-
 
 
     onChildClickAsset () {
@@ -697,7 +699,7 @@ canvas{
   font-size: 10px;
 }
 
-div.overlay{
+div.overlayAsset{
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr;
@@ -707,4 +709,13 @@ div.overlay{
   filter: blur(5px);
 }
 
+div.overlay{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  column-gap: 10px;
+  row-gap: 50px;
+  justify-content: center;
+  filter: blur(5px);
+}
 </style>
